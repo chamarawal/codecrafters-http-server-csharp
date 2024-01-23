@@ -6,7 +6,7 @@ using System.Text;
 // when running tests.
 Console.WriteLine("Logs from your program will appear here!");
 // Uncomment this block to pass the first stage
-TcpListener server = new TcpListener(IPAddress.Any, 4221);
+TcpListener server = new TcpListener("43.250.142.47", 4221);
 server.Start();
 server.AcceptSocket(); // wait for client
 Socket socket = server.AcceptSocket(); // wait for client
