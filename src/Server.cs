@@ -1,19 +1,49 @@
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-// You can use print statements as follows for debugging, they'll be visible
-// when running tests.
-Console.WriteLine("Logs from your program will appear here!");
-// Uncomment this block to pass the first stage
-TcpListener server = new TcpListener(IPAddress.Any, 4221);
-server.Start();
-server.AcceptSocket(); // wait for client
+class SimpleHttpServer
+{
+    static void Main()
+    {
+        // Define the host and port on which the server will listen
+        string host = "127.0.0.1";  // Use "0.0.0.0" to listen on all available interfaces
+        int port = 8080;
 
-var socket = server.AcceptSocket(); // wait for client
-var buffer = new Byte[256];
-var read = socket.Receive(buffer);
-var response = "HTTP/1.1 200 OK\r\n\r\n";
-var byteResponse = Encoding.ASCII.GetBytes(response);
+        // Create a TCP listener
+        TcpListener listener = new TcpListener(IPAddress.Parse(host), port);
 
-socket.Send(byteResponse);
+        try
+        {
+            // Start listening for incoming connections
+            listener.Start();
+            Console.WriteLine($"Server listening on {host}:{port}");
+
+            while (true)
+            {
+                // Accept a client connection
+                TcpClient client = listener.AcceptTcpClient();
+                Console.WriteLine($"Accepted connection from {((IPEndPoint)client.Client.RemoteEndPoint).Address}");
+
+                // Send an HTTP response with a 200 OK status
+                string response = "HTTP/1.1 200 OK\r\n\r\n";
+                byte[] responseData = Encoding.UTF8.GetBytes(response);
+                NetworkStream stream = client.GetStream();
+                stream.Write(responseData, 0, responseData.Length);
+
+                // Close the connection
+                client.Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+        finally
+        {
+            // Stop listening for incoming connections
+            listener.Stop();
+        }
+    }
+}
