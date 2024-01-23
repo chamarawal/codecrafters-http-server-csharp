@@ -9,10 +9,11 @@ Console.WriteLine("Logs from your program will appear here!");
 TcpListener server = new TcpListener(IPAddress.Any, 4221);
 server.Start();
 server.AcceptSocket(); // wait for client
-// server.AcceptSocket(); // wait for client
-Socket socket = server.AcceptSocket(); // wait for client
-byte[] buffer = new byte[1024];
-socket.Receive(buffer);
-socket.Send(Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\r\n\r\n"));
 
-socket.Close();
+var socket = server.AcceptSocket(); // wait for client
+var buffer = new Byte[256];
+var read = socket.Receive(buffer);
+var response = "HTTP/1.1 200 OK\r\n\r\n";
+var byteResponse = Encoding.ASCII.GetBytes(response);
+
+socket.Send(byteResponse);
